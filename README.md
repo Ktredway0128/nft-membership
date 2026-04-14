@@ -1,6 +1,6 @@
 # NFT MEMBERSHIP CONTRACT
 
-[![Verified on Etherscan](https://img.shields.io/badge/Etherscan-Verified-brightgreen)](https://sepolia.etherscan.io/address/TO_BE_UPDATED#code)
+[![Verified on Etherscan](https://img.shields.io/badge/Etherscan-Verified-brightgreen)](https://sepolia.etherscan.io/address/0xF12215b2156f0E1dB8039d78FBad734b8f2158ac#code)
 
 ![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)
 ![Solidity](https://img.shields.io/badge/Solidity-0.8.19-blue)
@@ -279,9 +279,10 @@ Call withdraw with the recipient address to collect all ETH from mints.
 
 | Contract | Address | Etherscan |
 |----------|---------|-----------|
-| NftMembership | TO_BE_UPDATED | View on Etherscan |
+| NftMembership | 0xF12215b2156f0E1dB8039d78FBad734b8f2158ac | View on Etherscan | (https://sepolia.etherscan.io/address/0xF12215b2156f0E1dB8039d78FBad734b8f2158ac#code)
 
-Deployed: TO_BE_UPDATED
+
+Deployed: 4-14-2026
 
 
 ## EXAMPLE CONFIGURATION
