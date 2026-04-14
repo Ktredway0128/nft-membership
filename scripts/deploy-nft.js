@@ -8,7 +8,7 @@ async function main() {
 
     const name = "Membership Pass";
     const symbol = "PASS";
-    const maxSupply = 1000;
+    const maxSupply = 5;
     const mintPrice = hre.ethers.utils.parseEther("0.05");
     const whitelistMintPrice = hre.ethers.utils.parseEther("0.03");
     const baseURI = "ipfs://YOUR_CID_HERE/";
