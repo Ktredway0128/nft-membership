@@ -70,6 +70,7 @@ The whitelist uses a Merkle tree for gas-efficient verification.
 Only addresses included in the Merkle tree can mint during the whitelist phase.
 Each whitelisted address is limited to one whitelist mint.
 The Merkle root is configurable by the admin before the whitelist phase opens.
+Use the included generate-whitelist.js script to generate the root and verify proofs from any address list.
 
 MINT PRICING
 
@@ -131,6 +132,8 @@ Mocha & Chai – JavaScript testing framework
 
 MerkleTreeJS – Merkle tree construction for whitelist verification
 
+keccak256 – Leaf hashing for Merkle verification
+
 Alchemy – Ethereum RPC provider
 
 Sepolia Test Network – Deployment environment
@@ -144,6 +147,8 @@ contracts/
 
 scripts/
     deploy-nft.js
+    generate-whitelist.js
+    deploy-mock-erc20.js
 
 test/
     NftMembership.test.js
@@ -157,7 +162,9 @@ Contains the NftMembership ERC-721 contract and a MockERC20 used for testing ERC
 
 SCRIPTS
 
-Contains the deployment script for the NftMembership contract.
+deploy-nft.js — deploys the NftMembership contract with configured parameters.
+generate-whitelist.js — generates the Merkle root and per-address proofs from a whitelist array. Run this script whenever the whitelist changes and update the on-chain root via the admin panel or dashboard.
+deploy-mock-erc20.js — deploys a mock ERC-20 and sends tokens to the NFT contract for testing the recover function.
 
 TESTS
 
@@ -233,29 +240,38 @@ Sign transactions using the deployer's wallet
 
 ## DEPLOYMENT
 
-### STEP 1 - Deploy the contract:
+### STEP 1 - Generate your whitelist:
+
+node scripts/generate-whitelist.js
+
+Add your client addresses to the whitelist array in the script.
+The script logs the Merkle root and a proof for each address.
+Save the root — you will need it for deployment and the admin panel.
+
+### STEP 2 - Deploy the contract:
 
 npx hardhat run scripts/deploy-nft.js --network sepolia
 
 The deployment script deploys NftMembership with your configured name, symbol,
 max supply, mint prices, base URI, and initial Merkle root.
 
-### STEP 2 - Set the Merkle root:
+### STEP 3 - Set the Merkle root:
 
 Before opening the whitelist phase generate your Merkle tree from the whitelist addresses
-and call setMerkleRoot with the root hash.
+and call setMerkleRoot with the root hash. If using the dashboard this is handled
+automatically from the whitelist.json file in the frontend.
 
-### STEP 3 - Open whitelist minting:
+### STEP 4 - Open whitelist minting:
 
 Call advancePhase to move from Paused to Whitelist.
-Whitelisted addresses can now mint using their Merkle proof at the whitelist price.
+Whitelisted addresses can now mint at the whitelist price.
 
-### STEP 4 - Open public minting:
+### STEP 5 - Open public minting:
 
 Call advancePhase again to move from Whitelist to Public.
 Any address can now mint at the public price until max supply is reached.
 
-### STEP 5 - Withdraw collected ETH:
+### STEP 6 - Withdraw collected ETH:
 
 Call withdraw with the recipient address to collect all ETH from mints.
 
@@ -263,7 +279,7 @@ Call withdraw with the recipient address to collect all ETH from mints.
 
 | Contract | Address | Etherscan |
 |----------|---------|-----------|
-| NftMembership | `TO_BE_UPDATED` | [View on Etherscan](https://sepolia.etherscan.io/address/TO_BE_UPDATED#code) |
+| NftMembership | TO_BE_UPDATED | View on Etherscan |
 
 Deployed: TO_BE_UPDATED
 
@@ -272,7 +288,7 @@ Deployed: TO_BE_UPDATED
 
 Token Name: Membership Pass
 Token Symbol: PASS
-Max Supply: 1,000
+Max Supply: 100
 Public Mint Price: 0.05 ETH
 Whitelist Mint Price: 0.03 ETH
 Base URI: ipfs://YOUR_CID_HERE/
@@ -292,6 +308,7 @@ A Merkle tree was chosen over a simple mapping for whitelist verification
 because it is significantly more gas efficient at scale.
 Adding thousands of addresses to an on-chain mapping requires thousands of transactions.
 A Merkle tree only requires storing a single 32-byte root on-chain regardless of list size.
+The generate-whitelist.js script handles all Merkle tree construction off-chain.
 
 FORWARD-ONLY PHASES
 
