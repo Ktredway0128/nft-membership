@@ -1,105 +1,119 @@
-# TOKEN LAUNCH CONTRACT
+# NFT MEMBERSHIP CONTRACT
 
-[![Verified on Etherscan](https://img.shields.io/badge/Etherscan-Verified-brightgreen)](https://sepolia.etherscan.io/address/0x036150039c33b1645080a9c913f96d4c65ccca48#code)
+[![Verified on Etherscan](https://img.shields.io/badge/Etherscan-Verified-brightgreen)](https://sepolia.etherscan.io/address/TO_BE_UPDATED#code)
 
 ![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)
 ![Solidity](https://img.shields.io/badge/Solidity-0.8.19-blue)
 ![Hardhat](https://img.shields.io/badge/Built%20with-Hardhat-yellow)
 
-Built by [Kyle Tredway Development](https://kyle-tredway-portfolio.netlify.app/) — professional Solidity smart contract packages for Web3 companies.
+Built by [Tredway Development](https://tredwaydev.com) — professional Solidity smart contract packages for Web3 companies.
 
-A secure and production-ready ERC-20 token built with Solidity, OpenZeppelin, and Hardhat.
+A secure and production-ready NFT membership pass system built with Solidity, OpenZeppelin ERC-721, and Hardhat.
 
-> ⚠️ These contracts have not been professionally audited. A full security audit is strongly recommended before any mainnet deployment.
+> ⚠️ This contract has not been professionally audited. A full security audit is strongly recommended before any mainnet deployment.
 
-This project demonstrates the full lifecycle of a token launch including:
+
+This project demonstrates a complete NFT membership pass system including:
 
 Smart contract development
 Automated testing
 Deployment scripting
+Phased minting with whitelist and public mint
+Merkle tree whitelist verification
+Role-based administrative permissions
 Security best practices
 
-The repository represents the foundation of an ERC-20 Token Launch package, which can be expanded with additional Web3 infrastructure such as crowdsales, vesting contracts, staking systems, and DAO governance.
+This repository represents an optional add-on package in a Web3 infrastructure suite, complementing the ERC-20 Token Launch, Token Vesting, Merkle Airdrop, Token Staking, Token Crowdsale, and Token Governance contracts to complete a full token ecosystem.
 
 
-## PROJECT GOALS 
+## PROJECT GOALS
 
-The purpose of this project is to demonstrate how a modern ERC-20 token should be designed for real-world use.
+The purpose of this project is to demonstrate how a modern on-chain membership pass system should be designed for real-world use.
 
-The contract includes common features required by token launches:
+The system includes common features required by token membership protocols:
 
-Controlled token minting
-Maximum supply limits
-Emergency pause capability
-Token burning
+Phased minting with admin-controlled phase advancement
+Merkle tree whitelist for gas-efficient early access verification
+Configurable max supply and mint pricing
+IPFS-based token metadata for membership card imagery
 Role-based administrative permissions
-Event logging for transparency
+Emergency pause and unpause controls
+ERC-20 recovery for accidentally sent tokens
 
-These patterns are widely used in production Web3 applications.
+These patterns are widely used in production NFT and membership applications.
 
 
 ## SMART CONTRACT FEATURES
 
-FIXED MAXIMUM SUPPLY
+### NFT MEMBERSHIP
 
-The contract enforces a hard cap on the total supply using OpenZeppelin's ERC20Capped.
-This prevents tokens from being minted beyond the maximum supply.
+OPENZEPPELIN ERC-721 FRAMEWORK
 
-INITIAL TOKEN MINT
+The contract is built on the OpenZeppelin ERC-721 framework — the industry standard
+for non-fungible tokens used across thousands of production NFT projects.
+This provides a battle-tested foundation with well-audited security properties.
 
-When the contract is deployed, an initial supply of tokens is minted directly to the deployer.
+PHASED MINTING
+
+The contract uses a three-phase minting system controlled by the admin.
+Phases advance forward only — once public minting opens it cannot revert to whitelist.
+
+PHASE        DESCRIPTION
+
+Paused       Default state — no minting allowed
+Whitelist    Only Merkle-verified addresses can mint at the whitelist price
+Public       Open minting for any address at the public price
+
+MERKLE WHITELIST
+
+The whitelist uses a Merkle tree for gas-efficient verification.
+Only addresses included in the Merkle tree can mint during the whitelist phase.
+Each whitelisted address is limited to one whitelist mint.
+The Merkle root is configurable by the admin before the whitelist phase opens.
+
+MINT PRICING
+
+Two separate mint prices are configurable at deployment and updatable by the admin.
+The whitelist mint price is typically set lower than the public mint price
+to reward early community members and investors.
+Overpayment is accepted — the contract collects the full msg.value sent.
+
+MAX SUPPLY
+
+A hard cap on total passes is set at deployment and enforced on every mint.
+Once max supply is reached no further minting is possible regardless of phase.
+
+IPFS METADATA
+
+Each membership pass points to metadata stored on IPFS.
+The base URI is configurable by the admin to support metadata updates or reveals.
+Token URIs follow the standard baseURI + tokenId pattern.
 
 ROLE-BASED PERMISSIONS
 
-Administrative actions are protected using OpenZeppelin’s AccessControl.
+The contract uses OpenZeppelin AccessControl for role management.
 Roles include:
 
-ROLE DESCRIPTION
+ROLE                  DESCRIPTION
 
-DEFAULT_ADMIN_ROLE	Can manage roles
+DEFAULT_ADMIN_ROLE    Full administrative control — cannot be renounced
+ADMIN_ROLE            Phase management, config updates, pause, withdraw
 
-MINTER_ROLE	Allowed to mint tokens
+ERC-20 RECOVERY
 
-PAUSER_ROLE	Allowed to pause/unpause transfers
-
-MINTING
-
-Authorized accounts with the MINTER_ROLE can mint new tokens up to the cap.
-Every mint emits a TokensMinted event.
-
-BURNING
-
-Any token holder can permanently destroy tokens from their own balance using the burn function.
-Each burn emits a TokensBurned event.
-
-EMERGENCY PAUSE
-
-Authorized accounts with the PAUSER_ROLE can pause all token transfers.
-This is useful if a vulnerability or emergency occurs.
-Transfers resume when the contract is unpaused.
-
-BURN ON BEHALF (burnFrom)
-Any approved account can burn tokens on behalf of another address using burnFrom.
-Requires prior approval via the approve function.
-Each burn emits a TokensBurned event.
-
-ADMIN ROLE PROTECTION
-The contract prevents the admin from accidentally renouncing the DEFAULT_ADMIN_ROLE.
-This ensures the contract can never be permanently locked without an administrator.
+If ERC-20 tokens are accidentally sent to the contract address the admin
+can recover them using the recoverERC20 function.
+This function is limited to ERC-20 tokens only — membership passes
+held by the contract cannot be recovered through this function.
 
 EVENT TRACKING
 
-The contract emits events for important actions:
+The contract emits events for all important actions:
 
-TokensMinted
+PassMinted, PassBurned, PhaseAdvanced, MerkleRootUpdated,
+MintPriceUpdated, WhitelistMintPriceUpdated, BaseURIUpdated,
+Withdrawn, ERC20Recovered
 
-TokensBurned
-
-TokenPaused
-
-TokenUnpaused
-
-Events make it easier for applications, dashboards, and explorers to monitor contract activity.
 
 ## TECHNOLOGY STACK
 
@@ -115,87 +129,91 @@ OpenZeppelin Contracts – Secure smart contract libraries
 
 Mocha & Chai – JavaScript testing framework
 
+MerkleTreeJS – Merkle tree construction for whitelist verification
+
 Alchemy – Ethereum RPC provider
 
 Sepolia Test Network – Deployment environment
 
+
 ## PROJECT STRUCTURE
 
 contracts/
-    SampleToken.sol
+    NftMembership.sol
+    MockERC20.sol
 
 scripts/
-    deploy-token.js
+    deploy-nft.js
 
 test/
-    SampleToken.test.js
+    NftMembership.test.js
 
 hardhat.config.js
 .env
 
 CONTRACTS
 
-Contains the ERC-20 smart contract implementation.
+Contains the NftMembership ERC-721 contract and a MockERC20 used for testing ERC-20 recovery.
 
 SCRIPTS
 
-Contains the deployment script used to deploy the token.
+Contains the deployment script for the NftMembership contract.
 
 TESTS
 
-Contains automated tests verifying all major contract behaviors.
+Contains 40 automated tests verifying all major contract behaviors including
+phased minting, whitelist verification, access control, and edge cases.
+
 
 ## SMART CONTRACT ARCHITECTURE
 
-The SampleToken contract extends several OpenZeppelin modules:
+The NftMembership contract extends the following OpenZeppelin modules:
 
-ERC20
+ERC721, ERC721Burnable, ERC721Pausable, AccessControl
 
-ERC20Burnable
+Whitelist verification uses the OpenZeppelin MerkleProof library.
 
-ERC20Capped
+Key configuration parameters:
 
-ERC20Pausable
+maxSupply             – Maximum number of passes that can ever be minted
+mintPrice             – ETH price per pass during public mint
+whitelistMintPrice    – ETH price per pass during whitelist mint
+baseURI               – IPFS URI pointing to membership card metadata
+merkleRoot            – Root of the Merkle tree for whitelist verification
 
-AccessControl
-
-This modular architecture provides strong security and reusable functionality while keeping the contract easy to audit.
 
 ## INSTALLATION
 
 ### CLONE THE REPOSITORY:
 
-git clone https://github.com/Ktredway0128/token-launch
+git clone https://github.com/Ktredway0128/nft-membership
 
-cd token-launch
+cd nft-membership
 
 ### INSTALL DEPENDENCIES:
 
 npm install
 
-### COMPILE THE CONTRACT:
+### COMPILE THE CONTRACTS:
 
 npx hardhat compile
 
-### RUN THE TEST SUITE :
+### RUN THE TEST SUITE:
 
 npx hardhat test
 
 ### THE TESTS VALIDATE:
 
-Token initialization
+Phased minting and phase advancement
+Merkle whitelist verification and proof validation
+Public mint access and supply enforcement
+Pause and unpause controls
+Token burning and transfers
+ETH withdrawal
+Admin configuration updates
+ERC-20 recovery
+Edge cases including overpayment, cross-address proofs, and operator transfers
 
-Transfers
-
-Mint permissions
-
-Pause / unpause functionality
-
-Token burning
-
-Supply cap enforcement
-
-Role-based access control
 
 ## ENVIRONMENT SETUP
 
@@ -212,97 +230,137 @@ These values allow Hardhat to:
 Connect to the Sepolia network
 Sign transactions using the deployer's wallet
 
+
 ## DEPLOYMENT
 
-To deploy the contract to Sepolia:
+### STEP 1 - Deploy the contract:
 
-npx hardhat run scripts/deploy-token.js --network sepolia
+npx hardhat run scripts/deploy-nft.js --network sepolia
 
-The deployment script performs the following steps:
+The deployment script deploys NftMembership with your configured name, symbol,
+max supply, mint prices, base URI, and initial Merkle root.
 
-Retrieves the deployer wallet
+### STEP 2 - Set the Merkle root:
 
-Creates the contract factory
+Before opening the whitelist phase generate your Merkle tree from the whitelist addresses
+and call setMerkleRoot with the root hash.
 
-Deploys the token with constructor parameters
+### STEP 3 - Open whitelist minting:
 
-Waits for confirmation
+Call advancePhase to move from Paused to Whitelist.
+Whitelisted addresses can now mint using their Merkle proof at the whitelist price.
 
-Outputs the deployed contract address..
+### STEP 4 - Open public minting:
+
+Call advancePhase again to move from Whitelist to Public.
+Any address can now mint at the public price until max supply is reached.
+
+### STEP 5 - Withdraw collected ETH:
+
+Call withdraw with the recipient address to collect all ETH from mints.
 
 ### SEPOLIA TESTNET DEPLOYMENT
 
 | Contract | Address | Etherscan |
 |----------|---------|-----------|
-| SampleToken | `0x036150039c33b1645080a9c913f96D4c65ccca48` | [View on Etherscan](https://sepolia.etherscan.io/address/0x036150039c33b1645080a9c913f96D4c65ccca48#code) |
+| NftMembership | `TO_BE_UPDATED` | [View on Etherscan](https://sepolia.etherscan.io/address/TO_BE_UPDATED#code) |
 
-Deployed: 2026-03-19
+Deployed: TO_BE_UPDATED
 
-## EXAMPLE TOKEN CONFIGURATION
 
-Example parameters used in deployment:
+## EXAMPLE CONFIGURATION
 
-Token Name: Sample Token
+Token Name: Membership Pass
+Token Symbol: PASS
+Max Supply: 1,000
+Public Mint Price: 0.05 ETH
+Whitelist Mint Price: 0.03 ETH
+Base URI: ipfs://YOUR_CID_HERE/
 
-Token Symbol: STK
 
-Maximum Supply: 1,000,000 tokens
+## DESIGN DECISIONS
 
-Initial Supply: 100,000 tokens
+ERC-721 STANDARD
+
+Standard OpenZeppelin ERC-721 was chosen over proxy or upgradeable patterns
+for the freelance suite. This keeps the contract simple, auditable, and gas efficient.
+Clients who require upgradeability can request a custom proxy deployment.
+
+MERKLE WHITELIST
+
+A Merkle tree was chosen over a simple mapping for whitelist verification
+because it is significantly more gas efficient at scale.
+Adding thousands of addresses to an on-chain mapping requires thousands of transactions.
+A Merkle tree only requires storing a single 32-byte root on-chain regardless of list size.
+
+FORWARD-ONLY PHASES
+
+Phase advancement is intentionally one-directional.
+Once the public phase opens it cannot revert to whitelist.
+This prevents admin manipulation of mint access after launch
+and builds community trust in the minting process.
+
+NOT MARKETED AS AN NFT
+
+This contract is marketed as a Token Membership Pass or On-Chain Access Credential
+rather than an NFT. The focus is on utility and access rather than collectibility,
+making it more approachable for non-crypto-native clients.
 
 
 ## SECURITY PRACTICES
 
 The contract uses well-established patterns from OpenZeppelin including:
 
-Supply caps
-
-Role-based permissions
-
-Emergency pause mechanisms
-
-Audited contract libraries
+Battle-tested ERC-721 framework used across thousands of production projects
+MerkleProof verification for gas-efficient and manipulation-resistant whitelisting
+Role-based permissions with renounce protection on DEFAULT_ADMIN_ROLE
+Pausable transfers for emergency response
+Forward-only phase advancement to prevent admin manipulation
 
 These are common practices used in production smart contracts.
 
+
 ## EXAMPLE USE CASES
 
-This ERC-20 architecture can support many types of projects:
+This membership pass contract can support many types of projects:
 
-DAO governance tokens
+Early investor credentials for token launches
+Community membership passes for DAOs and protocols
+On-chain access credentials for gated platforms
+Protocol access passes for DeFi applications
+Whitelist passes for future token sales or airdrops
+Contributor badges for open source or DAO teams
 
-Startup utility tokens
 
-Game economies
+## BUNDLE WITH THE FULL SUITE
 
-Loyalty rewards
+This contract is available as a standalone deployment or as an add-on
+to any tier in the Tredway Development infrastructure suite.
 
-DeFi protocol tokens
+Standalone:      $800 - $1,000
+Add-on to tier:  $600
+
+For the full suite including Token, Crowdsale, Vesting, Airdrop, Staking,
+Governance, and NFT Membership visit tredwaydev.com.
+
 
 ## FUTURE ENHANCEMENTS
 
-This project serves as the base layer for a larger Web3 infrastructure package.
-
 Possible upgrades include:
 
-Token crowdsale contracts
+Tiered membership passes — Gold, Silver, Bronze with different mint prices and supplies
+Upgradeable proxy pattern for post-deployment improvements
+NFT-gated staking rewards — bonus APY for pass holders
+NFT-gated governance — require pass to participate in DAO voting
+Cross-contract integration with the full ERC-20 suite
 
-Investor vesting schedules
-
-Staking rewards
-
-Governance (DAO voting)
-
-Treasury management
-
-Upgradeable proxy contracts
 
 ## AUTHOR
 
 Kyle Tredway
 
-Smart Contract Developer/Token Launch Specialist
+Smart Contract Developer / Token Launch Specialist
 
 License
 
-MIT License
+MIT

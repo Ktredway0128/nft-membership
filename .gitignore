@@ -4,3 +4,4 @@ cache
 .env
 coverage
 typechain-types
+deployments/local.json
