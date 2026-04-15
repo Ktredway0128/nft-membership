@@ -18,12 +18,12 @@
     "chai": "^6.2.2",
     "ethereum-waffle": "^4.0.10",
     "ethers": "^5.8.0",
-    "hardhat": "^2.28.6"
+    "hardhat": "^2.28.6",
+    "keccak256": "^1.0.6",
+    "merkletreejs": "^0.6.0"
   },
   "dependencies": {
     "@openzeppelin/contracts": "^4.9.3",
-    "dotenv": "^17.3.1",
-    "keccak256": "^1.0.6",
-    "merkletreejs": "^0.6.0"
+    "dotenv": "^17.3.1"
   }
 }
